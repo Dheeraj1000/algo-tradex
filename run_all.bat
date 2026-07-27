@@ -1,0 +1,16 @@
+@echo off
+echo Starting AlgoTradeX Services...
+
+echo Starting AI Service...
+start "AI Service" cmd /k "cd ai-service && python -m uvicorn main:app --port 8001"
+
+echo Starting AI Market Monitor...
+start "AI Market Monitor" cmd /k "cd ai-service && python market_monitor.py"
+
+echo Starting Spring Boot Backend...
+start "Backend" cmd /k "cd backend && mvn spring-boot:run"
+
+echo Starting React Frontend...
+start "Frontend" cmd /k "cd frontend && npm run dev"
+
+echo All services launched in separate windows!

@@ -1,0 +1,23 @@
+# Phase 2 Tasks
+
+- [x] Setup Core Infrastructure
+  - [x] Install dependencies (react-router-dom, react-query, axios, zustand, lucide-react, framer-motion)
+  - [x] Configure Axios instance with interceptors
+- [x] Design System & Foundation
+  - [x] Update index.css with CSS variables (premium dark theme)
+  - [x] Setup global styles and typography
+- [x] Core Reusable Components
+  - [x] Button component
+  - [x] Input component
+  - [x] Card component
+- [x] Authentication Flow
+  - [x] Zustand Auth Store
+  - [x] Login Page UI
+  - [x] Register Page UI
+- [x] Dashboard Layout
+  - [x] Sidebar Navigation
+  - [x] Top Header
+  - [x] Protected Route Wrapper
+- [x] Dashboard Home (Mockup)
+  - [x] Responsive Grid Layout
+  - [x] Mock Widgets (Account Summary, Live P&L, Active Orders)

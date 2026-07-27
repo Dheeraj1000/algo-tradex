@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+yfinance
+pandas
+scikit-learn
+xgboost
+joblib
+
+dhanhq==1.3.0

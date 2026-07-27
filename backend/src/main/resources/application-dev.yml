@@ -1,0 +1,123 @@
+# =============================================
+# AlgoTradeX - LOCAL DEV profile (No Docker)
+# Uses H2 in-memory DB, Redis disabled
+# =============================================
+
+spring:
+  application:
+    name: AlgoTradeX
+
+  # H2 In-Memory Database (replaces PostgreSQL for dev)
+  datasource:
+    url: jdbc:h2:file:./data/algotradex-dev;MODE=PostgreSQL;AUTO_SERVER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA - let Hibernate create tables automatically
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Kolkata
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  # Disable Flyway for H2 (Flyway scripts use PostgreSQL syntax)
+  flyway:
+    enabled: false
+
+  # Disable Redis
+  data:
+    redis:
+      repositories:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+  # Jackson
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+
+  # Cache - use simple in-memory cache instead of Redis
+  cache:
+    type: simple
+
+# Application Properties
+app:
+  jwt:
+    secret: dev-secret-key-minimum-32-characters-long-for-hmac-sha256
+    expiration-ms: 900000
+    refresh-expiration-ms: 604800000
+
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:5173
+
+  encryption:
+    key: 32-byte-encryption-key-change-me!
+    algorithm: AES/GCM/NoPadding
+
+  email:
+    from: noreply@algotradex.com
+    verification-url: http://localhost:5173/verify-email
+    reset-password-url: http://localhost:5173/reset-password
+
+  telegram:
+    bot-token: ""
+
+  ai-service:
+    url: http://localhost:8000
+
+  trading:
+    max-daily-loss-percent: 5.0
+    max-position-size-percent: 10.0
+    default-slippage-percent: 0.1
+    market-open-time: "09:15"
+    market-close-time: "15:30"
+    pre-market-open: "09:00"
+    timezone: Asia/Kolkata
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.algotradex: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+
+# SpringDoc
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+
+server:
+  port: 8080

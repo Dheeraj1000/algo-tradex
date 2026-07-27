@@ -1,0 +1,15 @@
+import requests
+from dhanhq import dhanhq, DhanContext
+import inspect
+
+# Inspect the dhanhq class to see the base url
+print("Dhanhq methods:", dir(dhanhq))
+
+client_id = "1112521202"
+access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzgzNjE2MjUzLCJpYXQiOjE3ODM1Mjk4NTMsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTEyNTIxMjAyIn0.QLg93TpRlCln85e5c84KUCQJvs-1AZPHIZvEH-nPLdplG1atwe4saEgkJPoofkQh86fs71RbTljUyTDUc3za8g"
+
+ctx = DhanContext(client_id, access_token)
+dhan = dhanhq(ctx)
+
+print(dhan.intraday_minute_data.__code__.co_consts)
+print(inspect.getsource(dhan.intraday_minute_data))

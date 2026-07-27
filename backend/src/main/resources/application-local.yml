@@ -1,0 +1,38 @@
+# =============================================
+# AlgoTradeX - LOCAL profile (PostgreSQL, no Redis)
+# =============================================
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/algotradex
+    username: algotradex
+    password: algotradex123
+
+  # Disable Redis
+  data:
+    redis:
+      repositories:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+  # Cache - use simple in-memory cache instead of Redis
+  cache:
+    type: simple
+
+  # JPA - use update mode for easier local dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  # Flyway - local dev: clean DB on validation error for fresh migrations
+  flyway:
+    clean-disabled: false
+    clean-on-validation-error: true
+
+logging:
+  level:
+    com.algotradex: DEBUG
+    org.springframework.security: DEBUG

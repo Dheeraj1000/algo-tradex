@@ -1,0 +1,1 @@
+ALTER TABLE trade_signals ADD COLUMN leverage INTEGER NOT NULL DEFAULT 1;
