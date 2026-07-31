@@ -4,7 +4,7 @@ import sys
 
 def run_monitor():
     url = "http://127.0.0.1:8001/models/predict"
-    token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzg1MjExMDU4LCJpYXQiOjE3ODUxMjQ2NTgsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTEyNTIxMjAyIn0.mV884cC2kDUwit-49c42fdEZu-4YX4uzJpDdaB-tZvIPRbB6CP8KUM2zCeTWc2--hL8ikcjXhdq_UTU4jErGbQ"
+    token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzg1NTU2MzA1LCJpYXQiOjE3ODU0Njk5MDUsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTEyNTIxMjAyIn0.1ojs09dJhiK7-XIRraJtGKWJZ7DghwVyukgydl-iIYeOBTLWJXa5bCCT90NJ5YmI3vyscj7mui9vpmpjl5quIw"
     client_id = "1112521202"
     
     last_alert = {"NIFTY": 0, "SENSEX": 0}

@@ -372,23 +372,24 @@ def predict(req: PredictRequest):
         
     # AI Output Filter (Prevent trading against the trend)
     current_spot = float(df['Close'].iloc[-1])
+    current_sma_10 = float(df_features['SMA_10'].iloc[-1]) if 'SMA_10' in df_features else current_spot
     current_sma_20 = float(df_features['SMA_20'].iloc[-1]) if 'SMA_20' in df_features else current_spot
     current_macd_hist = float(df_features['MACD_Hist'].iloc[-1]) if 'MACD_Hist' in df_features else 0.0
     
     if prob > 0.55: # AI wants to BUY_CALL
-        if current_spot < current_sma_20 and current_macd_hist < 0:
-            prob = 0.5 # Downgrade to HOLD because the actual market is clearly down
-        elif current_spot > current_sma_20 and current_macd_hist > 0:
+        if current_spot < current_sma_10 or (current_spot < current_sma_20 and current_macd_hist < 0):
+            prob = 0.5 # Downgrade to HOLD because market is crashing (below 10-SMA) or macro trend is down
+        elif current_spot > current_sma_10 and current_spot > current_sma_20 and current_macd_hist > 0:
             prob = 0.85 # BOOST to 85% confidence if perfectly aligned with UPTREND
     elif prob < 0.45: # AI wants to BUY_PUT
-        if current_spot > current_sma_20 and current_macd_hist > 0:
-            prob = 0.5 # Downgrade to HOLD because the actual market is clearly up
-        elif current_spot < current_sma_20 and current_macd_hist < 0:
+        if current_spot > current_sma_10 or (current_spot > current_sma_20 and current_macd_hist > 0):
+            prob = 0.5 # Downgrade to HOLD because market is pumping (above 10-SMA) or macro trend is up
+        elif current_spot < current_sma_10 and current_spot < current_sma_20 and current_macd_hist < 0:
             prob = 0.15 # BOOST to 85% confidence (1 - 0.15 = 0.85) if perfectly aligned with DOWNTREND
     else: # AI is UNSURE
-        if current_spot > current_sma_20 and current_macd_hist > 0:
+        if current_spot > current_sma_10 and current_spot > current_sma_20 and current_macd_hist > 0:
             prob = 0.85 # Trend is UP, override AI uncertainty
-        elif current_spot < current_sma_20 and current_macd_hist < 0:
+        elif current_spot < current_sma_10 and current_spot < current_sma_20 and current_macd_hist < 0:
             prob = 0.15 # Trend is DOWN, override AI uncertainty
     
     import news_sentiment
