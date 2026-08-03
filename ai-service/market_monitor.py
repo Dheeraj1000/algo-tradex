@@ -20,7 +20,8 @@ def send_telegram_message(message):
         print(f"Failed to send Telegram message: {e}")
 
 def run_monitor():
-    url = "http://127.0.0.1:8001/models/predict"
+    port = os.getenv("PORT", "8000")
+    url = os.getenv("API_URL", f"http://127.0.0.1:{port}/models/predict")
     client_id = "1112521202"
     
     last_alert = {"NIFTY": 0, "SENSEX": 0, "BANKNIFTY": 0}
@@ -115,7 +116,8 @@ def run_monitor():
                                     "targetLtp": target_ltp,
                                     "recommendedEntry": recommended_entry
                                 }
-                                requests.post("http://127.0.0.1:8080/api/market-data/ai-alerts", json=payload, timeout=10)
+                                backend_url = os.getenv("BACKEND_URL", "http://127.0.0.1:8080")
+                                requests.post(f"{backend_url}/api/market-data/ai-alerts", json=payload, timeout=10)
                                 
                                 rr_ratio = round(target_pts / sl_pts, 2) if sl_pts > 0 else 0
                                 direction = "BUY CALL 📈" if sig == "BUY_CALL" else "BUY PUT 📉" if sig == "BUY_PUT" else sig.upper()
