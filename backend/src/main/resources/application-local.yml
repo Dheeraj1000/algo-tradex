@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/algotradex
+    username: algotradex
+    password: algotradex123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.algotradex: DEBUG
+    org.hibernate.SQL: DEBUG
