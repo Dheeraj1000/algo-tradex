@@ -74,9 +74,9 @@ def ingest_data(req: IngestRequest):
     }
 
 def fetch_dhan_data(client_id, access_token, symbol, period, interval):
+    import pandas as pd
     try:
         from dhanhq import dhanhq, DhanContext
-        import pandas as pd
         from datetime import datetime, timedelta
         from data.dhan_master_downloader import get_atm_option
         
