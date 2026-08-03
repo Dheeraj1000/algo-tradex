@@ -76,6 +76,27 @@ def compute_features(df: pd.DataFrame) -> pd.DataFrame:
     df['OBV_EMA'] = df['OBV'].ewm(span=20).mean()
     df['OBV_Dist'] = (df['OBV'] - df['OBV_EMA']) / df['OBV_EMA'].replace(0, 1)
 
+    # 8.2 Candlestick Patterns
+    body = np.abs(df['Close'] - df['Open'])
+    upper_shadow = np.maximum(df['High'] - np.maximum(df['Close'], df['Open']), 0)
+    lower_shadow = np.maximum(np.minimum(df['Close'], df['Open']) - df['Low'], 0)
+    range_ = np.maximum(df['High'] - df['Low'], 1e-5) # Prevent div by zero
+    
+    df['CDL_DOJI'] = (body < (range_ * 0.1)).astype(int)
+    df['CDL_MARUBOZU'] = (body > (range_ * 0.9)).astype(int)
+    
+    df['CDL_HAMMER'] = ((lower_shadow > (body * 2)) & (upper_shadow < (body * 0.2))).astype(int)
+    df['CDL_SHOOTING_STAR'] = ((upper_shadow > (body * 2)) & (lower_shadow < (body * 0.2))).astype(int)
+    
+    prev_close = df['Close'].shift(1)
+    prev_open = df['Open'].shift(1)
+    
+    df['CDL_BULL_ENGULF'] = ((df['Close'] > df['Open']) & (prev_close < prev_open) & (df['Close'] > prev_open) & (df['Open'] < prev_close)).astype(int)
+    df['CDL_BEAR_ENGULF'] = ((df['Close'] < df['Open']) & (prev_close > prev_open) & (df['Close'] < prev_open) & (df['Open'] > prev_close)).astype(int)
+    
+    df['CDL_BULL_HARAMI'] = ((df['Close'] > df['Open']) & (prev_close < prev_open) & (df['Close'] < prev_open) & (df['Open'] > prev_close)).astype(int)
+    df['CDL_BEAR_HARAMI'] = ((df['Close'] < df['Open']) & (prev_close > prev_open) & (df['Close'] > prev_open) & (df['Open'] < prev_close)).astype(int)
+
     # 8.5 Option Chain Sentiment (OI & PCR)
     if 'CE_OI' in df.columns and 'PE_OI' in df.columns:
         df['PCR'] = df['PE_OI'] / df['CE_OI'].replace(0, 1)
@@ -114,5 +135,7 @@ def get_feature_columns():
         'Dist_SMA_10', 'Dist_SMA_20', 'RSI_14', 
         'MACD', 'MACD_Signal', 'MACD_Hist', 'Volatility_10',
         'BB_Width', 'BB_Pct', 'ATR_Ratio', 'Stoch_K', 'Stoch_D', 'OBV_Dist',
+        'CDL_DOJI', 'CDL_MARUBOZU', 'CDL_HAMMER', 'CDL_SHOOTING_STAR',
+        'CDL_BULL_ENGULF', 'CDL_BEAR_ENGULF', 'CDL_BULL_HARAMI', 'CDL_BEAR_HARAMI',
         'PCR', 'Call_OI_Change', 'Put_OI_Change'
     ]

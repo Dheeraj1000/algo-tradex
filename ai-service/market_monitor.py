@@ -1,20 +1,39 @@
 import time
 import requests
 import sys
+import os
+from db_utils import get_active_token
+
+TELEGRAM_BOT_TOKEN = "8836474667:AAHlJiJDav0l0Uvk27mYMoQwcXFkLb5wehw"
+TELEGRAM_CHAT_ID = "-1004360777331"
+
+def send_telegram_message(message):
+    if TELEGRAM_BOT_TOKEN == "YOUR_TELEGRAM_BOT_TOKEN":
+        return
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "HTML"}
+    try:
+        res = requests.post(url, json=payload, timeout=15)
+        if res.status_code != 200:
+            print(f"Telegram API Error: {res.text}")
+    except Exception as e:
+        print(f"Failed to send Telegram message: {e}")
 
 def run_monitor():
     url = "http://127.0.0.1:8001/models/predict"
-    token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzg1NTU2MzA1LCJpYXQiOjE3ODU0Njk5MDUsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTEyNTIxMjAyIn0.1ojs09dJhiK7-XIRraJtGKWJZ7DghwVyukgydl-iIYeOBTLWJXa5bCCT90NJ5YmI3vyscj7mui9vpmpjl5quIw"
     client_id = "1112521202"
     
-    last_alert = {"NIFTY": 0, "SENSEX": 0}
+    last_alert = {"NIFTY": 0, "SENSEX": 0, "BANKNIFTY": 0}
     
-    print("Started monitoring NIFTY and SENSEX. Pinging AI Engine...")
+    print("Started monitoring NIFTY, SENSEX, and BANKNIFTY. Pinging AI Engine...")
     sys.stdout.flush()
     
     while True:
+        token = get_active_token()
+        if not token:
+            token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzg1ODE1NTU1LCJpYXQiOjE3ODU3MjkxNTUsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTEyNTIxMjAyIn0.Aw9DPnpbGs1Q9ZxVcxgaO-qHY3z1yZFohkOhlyOhimAEiR3vLc1Ld_0kCZQARRnQ_UzxARyU0CVQ9XkZ7J8jyA"
         try:
-            for sym in ["NIFTY", "SENSEX"]:
+            for sym in ["NIFTY", "SENSEX", "BANKNIFTY"]:
                 data = {"symbol": sym, "client_id": client_id, "access_token": token}
                 res = requests.post(url, json=data).json()
                 
@@ -88,9 +107,7 @@ def run_monitor():
                             
                             try:
                                 payload = {
-                                    "symbol": sym,
-                                    "spotPrice": spot,
-                                    "targetOption": target,
+                                    "symbol": target,
                                     "signal": sig,
                                     "confidence": conf,
                                     "targetProfit": target_pts,
@@ -99,14 +116,38 @@ def run_monitor():
                                     "recommendedEntry": recommended_entry
                                 }
                                 requests.post("http://127.0.0.1:8080/api/market-data/ai-alerts", json=payload, timeout=10)
+                                
+                                rr_ratio = round(target_pts / sl_pts, 2) if sl_pts > 0 else 0
+                                direction = "BUY CALL 📈" if sig == "BUY_CALL" else "BUY PUT 📉" if sig == "BUY_PUT" else sig.upper()
+                                
+                                tg_msg = f"""🚨 <b>AlgoTradeX High-Conviction Alert</b> 🚨
+
+🔹 <b>Asset:</b> {target}
+🔹 <b>Direction:</b> {direction}
+🔹 <b>Confidence:</b> {conf}%
+
+💰 <b>Entry:</b> ₹{recommended_entry}
+🎯 <b>Take Profit:</b> {target_pts} pts (₹{recommended_entry + target_pts})
+🛑 <b>Stop Loss:</b> {sl_pts} pts (₹{recommended_entry - sl_pts})
+⚖️ <b>Risk/Reward:</b> 1 : {rr_ratio}
+
+📊 <b>Rationale:</b>
+• <b>Strategy:</b> {strategy}
+• <b>Spot Price:</b> {spot:.2f}
+• <b>RSI (14):</b> {rsi:.2f}
+• <b>Sentiment:</b> {sentiment:.2f}
+
+<i>Trade responsibly and manage your risk!</i>"""
+                                send_telegram_message(tg_msg)
                             except Exception as e:
-                                print(f"Warning: Failed to broadcast alert to backend: {e}")
+                                print(f"Warning: Failed to broadcast alert to backend or telegram: {e}")
+
                                 
                             last_alert[sym] = time.time()
                     # Removed the 'Scanning...' else block to prevent log spam
         except Exception as e:
             print(f"Error in monitor loop: {e}")
-        time.sleep(5)
+        time.sleep(30)
 
 if __name__ == "__main__":
     run_monitor()
