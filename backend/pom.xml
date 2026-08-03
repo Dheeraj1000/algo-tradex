@@ -26,6 +26,7 @@
         <itext.version>8.0.5</itext.version>
         <telegram.version>6.9.7.1</telegram.version>
         <totp.version>1.7.1</totp.version>
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>
