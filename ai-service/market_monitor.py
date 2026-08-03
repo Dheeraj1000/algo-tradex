@@ -20,7 +20,7 @@ def send_telegram_message(message):
         print(f"Failed to send Telegram message: {e}")
 
 def run_monitor():
-    port = os.getenv("PORT", "8000")
+    port = os.getenv("PORT", "8001")
     url = os.getenv("API_URL", f"http://127.0.0.1:{port}/models/predict")
     client_id = "1112521202"
     
@@ -124,12 +124,12 @@ def run_monitor():
                                 
                                 tg_msg = f"""🚨 <b>AlgoTradeX High-Conviction Alert</b> 🚨
 
-🔹 <b>Asset:</b> {target}
-🔹 <b>Direction:</b> {direction}
-🔹 <b>Confidence:</b> {conf}%
+🎯 <b>Asset:</b> {target}
+📈 <b>Direction:</b> {direction}
+🔥 <b>Confidence:</b> {conf}%
 
 💰 <b>Entry:</b> ₹{recommended_entry}
-🎯 <b>Take Profit:</b> {target_pts} pts (₹{recommended_entry + target_pts})
+✅ <b>Take Profit:</b> {target_pts} pts (₹{recommended_entry + target_pts})
 🛑 <b>Stop Loss:</b> {sl_pts} pts (₹{recommended_entry - sl_pts})
 ⚖️ <b>Risk/Reward:</b> 1 : {rr_ratio}
 
@@ -146,6 +146,9 @@ def run_monitor():
 
                                 
                             last_alert[sym] = time.time()
+                else:
+                    print(f"API Error for {sym}: {res}")
+                    sys.stdout.flush()
                     # Removed the 'Scanning...' else block to prevent log spam
         except Exception as e:
             print(f"Error in monitor loop: {e}")
